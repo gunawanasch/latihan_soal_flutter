@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:latihan_soal_flutter/constants/r.dart';
+import 'package:latihan_soal_flutter/models/banner_list.dart';
+import 'package:latihan_soal_flutter/models/mapel_list.dart';
+import 'package:latihan_soal_flutter/models/network_response.dart';
+import 'package:latihan_soal_flutter/repository/latihan_soal_api.dart';
 import 'package:latihan_soal_flutter/view/main/latihan_soal/mapel_page.dart';
+import 'package:latihan_soal_flutter/view/main/latihan_soal/paket_soal_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -11,6 +16,32 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  MapelList? mapelList;
+  BannerList? bannerList;
+
+  getMapel() async {
+    final mapelResult = await LatihanSoalApi().getMapel();
+    if (mapelResult.status == Status.success) {
+      mapelList = MapelList.fromJson(mapelResult.data!);
+      setState(() {});
+    }
+  }
+
+  getBanner() async {
+    final bannerResult = await LatihanSoalApi().getBanner();
+    if (bannerResult.status == Status.success) {
+      bannerList = BannerList.fromJson(bannerResult.data!);
+      setState(() {});
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getMapel();
+    getBanner();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -20,7 +51,7 @@ class _HomePageState extends State<HomePage> {
           children: [
             _buildUserHomeProfile(),
             _buildTopBanner(context),
-            _buildHomeListMapel(),
+            _buildHomeListMapel(mapelList),
             Container(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -36,18 +67,30 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                   SizedBox(height: 10),
-                  Container(
-                    height: 150,
-                    child: ListView.builder(
-                      itemCount: 5,
-                      scrollDirection: Axis.horizontal,
-                      itemBuilder: ((context, index) {
-                        return Padding(
-                          padding: const EdgeInsets.only(left: 20.0),
-                          child: Image.asset(R.assets.bannerHome),
-                        );
-                    }),),
-                  ),
+                  bannerList == null
+                      ? Container(
+                          height: 70,
+                          width: double.infinity,
+                          child: Center(child: CircularProgressIndicator()),
+                        )
+                      : Container(
+                          height: 150,
+                          child: ListView.builder(
+                            itemCount: bannerList!.data!.length,
+                            scrollDirection: Axis.horizontal,
+                            itemBuilder: ((context, index) {
+                              final currentBanner = bannerList!.data![index];
+                              return Padding(
+                                padding: const EdgeInsets.only(left: 20.0),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(10),
+                                  child:
+                                      Image.network(currentBanner.eventImage!),
+                                ),
+                              );
+                            }),
+                          ),
+                        ),
                   SizedBox(height: 35),
                 ],
               ),
@@ -58,128 +101,161 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Container _buildHomeListMapel() {
+  Container _buildHomeListMapel(MapelList? list) {
     return Container(
-            margin: EdgeInsets.symmetric(horizontal: 20, vertical: 21),
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    Text(
-                      'Pilih Pelajaran',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
-                    Spacer(),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.of(context).pushNamed(MapelPage.route);
-                      },
-                      child: Text(
-                        'Lihat Semua',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 12,
-                          color: R.colors.primary,
-                        ),
-                      ),
-                    ),
-                  ],
+      margin: EdgeInsets.symmetric(horizontal: 20, vertical: 21),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Text(
+                'Pilih Pelajaran',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
                 ),
-                MapelWidget(),
-                MapelWidget(),
-                MapelWidget(),
-              ],
-            ),
-          );
+              ),
+              Spacer(),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context)
+                      .push(MaterialPageRoute(builder: (BuildContext context) {
+                    return MapelPage(mapel: mapelList!);
+                  }));
+                },
+                child: Text(
+                  'Lihat Semua',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                    color: R.colors.primary,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          list == null
+              ? Container(
+                  height: 70,
+                  width: double.infinity,
+                  child: Center(child: CircularProgressIndicator()),
+                )
+              : ListView.builder(
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
+                  itemCount: list.data!.length > 3 ? 3 : list.data!.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    final currentMapel = list.data![index];
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.of(context)
+                            .push(MaterialPageRoute(builder: (BuildContext context) {
+                          return PaketSoalPage(id: currentMapel.courseId!);
+                        }));
+                      },
+                      child: MapelWidget(
+                        title: currentMapel.courseName!,
+                        totalPacket: currentMapel.jumlahMateri!,
+                        totalDone: currentMapel.jumlahDone!,
+                      ),
+                    );
+                  }),
+        ],
+      ),
+    );
   }
 
   Container _buildTopBanner(BuildContext context) {
     return Container(
-            margin: const EdgeInsets.symmetric(
-              horizontal: 20.0,
-            ),
-            decoration: BoxDecoration(
-              color: R.colors.primary,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            height: 147,
-            width: double.infinity,
-            child: Stack(
-              children: [
-                Container(
-                  width: MediaQuery.of(context).size.width * 0.5,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20.0,
-                    vertical: 15,
-                  ),
-                  child: Text(
-                    'Mau kerjain latihan soal apa hari ini?',
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                Positioned(
-                  right: 0,
-                  bottom: 0,
-                  child: Image.asset(
-                    R.assets.imgHome,
-                    width: MediaQuery.of(context).size.width * 0.5,
-                  ),
-                ),
-              ],
-            ),
-          );
-  }
-
-  Padding _buildUserHomeProfile() {
-    return Padding(
+      margin: const EdgeInsets.symmetric(
+        horizontal: 20.0,
+      ),
+      decoration: BoxDecoration(
+        color: R.colors.primary,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      height: 147,
+      width: double.infinity,
+      child: Stack(
+        children: [
+          Container(
+            width: MediaQuery.of(context).size.width * 0.5,
             padding: const EdgeInsets.symmetric(
               horizontal: 20.0,
               vertical: 15,
             ),
-            child: Row(
+            child: Text(
+              'Mau kerjain latihan soal apa hari ini?',
+              style: TextStyle(
+                fontSize: 18,
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          Positioned(
+            right: 0,
+            bottom: 0,
+            child: Image.asset(
+              R.assets.imgHome,
+              width: MediaQuery.of(context).size.width * 0.5,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Padding _buildUserHomeProfile() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: 20.0,
+        vertical: 15,
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Hi, Nama User',
-                        style: GoogleFonts.poppins().copyWith(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      Text(
-                        'Selamat datang',
-                        style: GoogleFonts.poppins().copyWith(
-                          fontSize: 12,
-                        ),
-                      ),
-                    ],
+                Text(
+                  'Hi, Nama User',
+                  style: GoogleFonts.poppins().copyWith(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
-                Image.asset(
-                  R.assets.imgUser,
-                  width: 35,
-                  height: 35,
+                Text(
+                  'Selamat datang',
+                  style: GoogleFonts.poppins().copyWith(
+                    fontSize: 12,
+                  ),
                 ),
               ],
             ),
-          );
+          ),
+          Image.asset(
+            R.assets.imgUser,
+            width: 35,
+            height: 35,
+          ),
+        ],
+      ),
+    );
   }
 }
 
 class MapelWidget extends StatelessWidget {
   const MapelWidget({
     Key? key,
+    required this.title,
+    required this.totalDone,
+    required this.totalPacket,
   }) : super(key: key);
+
+  final String title;
+  final int? totalDone;
+  final int? totalPacket;
 
   @override
   Widget build(BuildContext context) {
@@ -208,14 +284,14 @@ class MapelWidget extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Matematika',
+                  title,
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 12,
                   ),
                 ),
                 Text(
-                  '0/50 Paket latihan soal',
+                  '$totalDone/$totalPacket Paket latihan soal',
                   style: TextStyle(
                     fontWeight: FontWeight.w500,
                     fontSize: 12,
@@ -235,8 +311,7 @@ class MapelWidget extends StatelessWidget {
                     ),
                     Container(
                       height: 5,
-                      width:
-                          MediaQuery.of(context).size.width * 0.4,
+                      width: MediaQuery.of(context).size.width * 0.4,
                       decoration: BoxDecoration(
                         color: R.colors.primary,
                         borderRadius: BorderRadius.circular(10),

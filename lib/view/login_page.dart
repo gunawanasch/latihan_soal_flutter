@@ -3,6 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:latihan_soal_flutter/constants/r.dart';
+import 'package:latihan_soal_flutter/helpers/preference_helper.dart';
+import 'package:latihan_soal_flutter/helpers/user_email.dart';
+import 'package:latihan_soal_flutter/models/network_response.dart';
+import 'package:latihan_soal_flutter/models/user_by_email.dart';
+import 'package:latihan_soal_flutter/repository/auth_api.dart';
+import 'package:latihan_soal_flutter/view/main_page.dart';
 import 'package:latihan_soal_flutter/view/register_page.dart';
 
 class LoginPage extends StatefulWidget {
@@ -74,9 +80,18 @@ class _LoginPageState extends State<LoginPage> {
               onTap: () async {
                 await signInWithGoogle();
 
-                final user = FirebaseAuth.instance.currentUser;
+                final user = UserEmail.getUserEmail();
                 if (user != null) {
-                  Navigator.of(context).pushNamed(RegisterPage.route);
+                  final dataUser = await AuthApi().getUserByEmail();
+                  if (dataUser.status == Status.success) {
+                    final data = UserByEmail.fromJson(dataUser.data!);
+                    if (data.status == 1) {
+                      await PreferenceHelper().setUserData(data.data!);
+                      Navigator.of(context).pushNamed(MainPage.route);
+                    } else {
+                      Navigator.of(context).pushNamed(RegisterPage.route);
+                    }
+                  }
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                     content: Text('Gagal Masuk'),
