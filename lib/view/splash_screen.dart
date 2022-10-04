@@ -19,8 +19,10 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+
   @override
-  Widget build(BuildContext context) {
+  void initState() {
+    super.initState();
     Timer(const Duration(seconds: 5), () async {
       final user = UserEmail.getUserEmail();
       if (user != null) {
@@ -37,7 +39,10 @@ class _SplashScreenState extends State<SplashScreen> {
         Navigator.of(context).pushReplacementNamed(LoginPage.route);
       }
     });
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: R.colors.primary,
       body: Center(

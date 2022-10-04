@@ -18,20 +18,22 @@ class MapelPage extends StatelessWidget {
       body: Padding(
         padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 20.0),
         child: ListView.builder(
-          itemCount: mapel.data!.length,
-          itemBuilder: ((context, index) {
-          final currentMapel = mapel.data![index];
-          return GestureDetector(
-            onTap: () {
-              Navigator.of(context).push(MaterialPageRoute(builder: (context) => PaketSoalPage(id: currentMapel.courseId!)));
-            },
-            child: MapelWidget(
-              title: currentMapel.courseName!,
-              totalPacket: currentMapel.jumlahMateri!,
-              totalDone: currentMapel.jumlahDone!,
-            ),
-          );
-        })),
+            itemCount: mapel.data!.length,
+            itemBuilder: ((context, index) {
+              final currentMapel = mapel.data![index];
+              return GestureDetector(
+                onTap: () {
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) =>
+                          PaketSoalPage(id: currentMapel.courseId!)));
+                },
+                child: MapelWidget(
+                  title: currentMapel.courseName!,
+                  totalPacket: currentMapel.jumlahMateri!,
+                  totalDone: currentMapel.jumlahDone!,
+                ),
+              );
+            })),
       ),
     );
   }
