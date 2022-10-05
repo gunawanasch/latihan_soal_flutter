@@ -78,6 +78,7 @@ class _MainPageState extends State<MainPage> {
                           Image.asset(
                             R.assets.icHome,
                             height: 20,
+                            color: index == 0 ? null : Colors.grey,
                           ),
                           Text('Home'),
                         ],
@@ -123,7 +124,10 @@ class _MainPageState extends State<MainPage> {
                       },
                       child: Column(
                         children: [
-                          Icon(Icons.person),
+                          Icon(
+                            Icons.person,
+                            color: index == 1 ? R.colors.primary : Colors.grey,
+                          ),
                           Text('Profile'),
                         ],
                       ),

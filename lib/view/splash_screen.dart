@@ -23,7 +23,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    Timer(const Duration(seconds: 5), () async {
+    Timer(const Duration(seconds: 3), () async {
       final user = UserEmail.getUserEmail();
       if (user != null) {
         final dataUser = await AuthApi().getUserByEmail();

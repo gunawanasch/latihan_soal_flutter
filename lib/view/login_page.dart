@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -46,6 +48,7 @@ class _LoginPageState extends State<LoginPage> {
         padding: const EdgeInsets.all(25.0),
         child: Column(
           children: [
+            const SizedBox(height: 20),
             Align(
               alignment: Alignment.topLeft,
               child: Text(
@@ -87,7 +90,7 @@ class _LoginPageState extends State<LoginPage> {
                     final data = UserByEmail.fromJson(dataUser.data!);
                     if (data.status == 1) {
                       await PreferenceHelper().setUserData(data.data!);
-                      Navigator.of(context).pushNamed(MainPage.route);
+                      Navigator.of(context).pushReplacementNamed(MainPage.route);
                     } else {
                       Navigator.of(context).pushNamed(RegisterPage.route);
                     }
@@ -117,7 +120,7 @@ class _LoginPageState extends State<LoginPage> {
                 ],
               ),
             ),
-            ButtonLogin(
+            if (Platform.isIOS) ButtonLogin(
               onTap: () {},
               backgroundColor: Colors.black,
               borderColor: Colors.black,
@@ -151,8 +154,10 @@ class ButtonLogin extends StatelessWidget {
     required this.child,
     required this.borderColor,
     required this.onTap,
+    this.radius,
   }) : super(key: key);
 
+  final double? radius;
   final Color backgroundColor;
   final Widget child;
   final Color borderColor;
@@ -167,7 +172,7 @@ class ButtonLogin extends StatelessWidget {
             primary: backgroundColor,
             elevation: 0,
             shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(25),
+                borderRadius: BorderRadius.circular(radius ?? 25),
                 side: BorderSide(
                   color: borderColor,
                 )),

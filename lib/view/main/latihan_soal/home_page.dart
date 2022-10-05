@@ -2,9 +2,11 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:latihan_soal_flutter/constants/r.dart';
+import 'package:latihan_soal_flutter/helpers/preference_helper.dart';
 import 'package:latihan_soal_flutter/models/banner_list.dart';
 import 'package:latihan_soal_flutter/models/mapel_list.dart';
 import 'package:latihan_soal_flutter/models/network_response.dart';
+import 'package:latihan_soal_flutter/models/user_by_email.dart';
 import 'package:latihan_soal_flutter/repository/latihan_soal_api.dart';
 import 'package:latihan_soal_flutter/view/main/latihan_soal/mapel_page.dart';
 import 'package:latihan_soal_flutter/view/main/latihan_soal/paket_soal_page.dart';
@@ -19,6 +21,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   MapelList? mapelList;
   BannerList? bannerList;
+  UserData? dataUser;
 
   getMapel() async {
     final mapelResult = await LatihanSoalApi().getMapel();
@@ -59,12 +62,18 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  Future getUserData() async {
+    dataUser = await PreferenceHelper().getUserData();
+    setState(() {});
+  }
+
   @override
   void initState() {
     super.initState();
     getMapel();
     getBanner();
     setupFcm();
+    getUserData();
   }
 
   @override
@@ -244,7 +253,7 @@ class _HomePageState extends State<HomePage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Hi, Nama User',
+                  'Hi, ' + (dataUser?.userName ?? 'Nama User'),
                   style: GoogleFonts.poppins().copyWith(
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
@@ -334,13 +343,31 @@ class MapelWidget extends StatelessWidget {
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
-                    Container(
-                      height: 5,
-                      width: MediaQuery.of(context).size.width * 0.4,
-                      decoration: BoxDecoration(
-                        color: R.colors.primary,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
+                    Row(
+                      children: [
+                        Expanded(
+                          flex: totalDone!,
+                          child: Container(
+                            height: 5,
+                            // width: MediaQuery.of(context).size.width * 0.4,
+                            decoration: BoxDecoration(
+                              color: R.colors.primary,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          flex: totalDone! - totalDone!,
+                          child: Container(
+                            // height: 5,
+                            // width: MediaQuery.of(context).size.width * 0.4,
+                            // decoration: BoxDecoration(
+                            //   color: R.colors.primary,
+                            //   borderRadius: BorderRadius.circular(10),
+                            // ),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 )
