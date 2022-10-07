@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:latihan_soal_flutter/constants/r.dart';
-import 'package:latihan_soal_flutter/models/mapel_list.dart';
 import 'package:latihan_soal_flutter/models/network_response.dart';
 import 'package:latihan_soal_flutter/models/paket_soal_list.dart';
-import 'package:latihan_soal_flutter/repository/latihan_soal_api.dart';
+import 'package:latihan_soal_flutter/providers/latihan_soal_provider.dart';
 import 'package:latihan_soal_flutter/view/main/latihan_soal/kerjakan_latihan_soal_page.dart';
+import 'package:provider/provider.dart';
 
 class PaketSoalPage extends StatefulWidget {
   const PaketSoalPage({Key? key, required this.id}) : super(key: key);
@@ -17,9 +17,11 @@ class PaketSoalPage extends StatefulWidget {
 
 class _PaketSoalPageState extends State<PaketSoalPage> {
   PaketSoalList? paketSoalList;
+  LatihanSoalProvider? latihanSoalProvider;
 
   getPaketSoal() async {
-    final paketSoalResult = await LatihanSoalApi().getPaketSoal(widget.id);
+    latihanSoalProvider = Provider.of<LatihanSoalProvider>(context, listen: false);
+    final paketSoalResult = await latihanSoalProvider!.getPaketSoal(widget.id);
     if (paketSoalResult.status == Status.success) {
       paketSoalList = PaketSoalList.fromJson(paketSoalResult.data!);
       setState(() {});
@@ -53,21 +55,21 @@ class _PaketSoalPageState extends State<PaketSoalPage> {
             Expanded(
               child: paketSoalList == null
                   ? Center(
-                      child: CircularProgressIndicator(),
-                    )
+                child: CircularProgressIndicator(),
+              )
                   : SingleChildScrollView(
-                    child: Wrap(
-                        children:
-                            List.generate(paketSoalList!.data!.length, (index) {
-                          final currentPaketSoal = paketSoalList!.data![index];
-                          return Container(
-                            padding: EdgeInsets.all(3),
-                            width: MediaQuery.of(context).size.width * 0.4,
-                            child: PaketSoalWidget(data: currentPaketSoal),
-                          );
-                        }).toList(),
-                      ),
-                  ),
+                child: Wrap(
+                  children:
+                  List.generate(paketSoalList!.data!.length, (index) {
+                    final currentPaketSoal = paketSoalList!.data![index];
+                    return Container(
+                      padding: EdgeInsets.all(3),
+                      width: MediaQuery.of(context).size.width * 0.4,
+                      child: PaketSoalWidget(data: currentPaketSoal),
+                    );
+                  }).toList(),
+                ),
+              ),
             ),
           ],
         ),

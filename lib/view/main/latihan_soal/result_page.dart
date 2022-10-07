@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:latihan_soal_flutter/constants/r.dart';
 import 'package:latihan_soal_flutter/models/network_response.dart';
 import 'package:latihan_soal_flutter/models/result_response.dart';
-import 'package:latihan_soal_flutter/repository/latihan_soal_api.dart';
+import 'package:latihan_soal_flutter/providers/latihan_soal_provider.dart';
+import 'package:provider/provider.dart';
 
 class ResultPage extends StatefulWidget {
   const ResultPage({Key? key, required this.exerciseId}) : super(key: key);
@@ -14,9 +15,11 @@ class ResultPage extends StatefulWidget {
 
 class _ResultPageState extends State<ResultPage> {
   ResultResponse? resultData;
+  LatihanSoalProvider? latihanSoalProvider;
 
   getResult() async {
-    final result = await LatihanSoalApi().getResult(widget.exerciseId);
+    latihanSoalProvider = Provider.of<LatihanSoalProvider>(context, listen: false);
+    final result = await latihanSoalProvider!.getResult(widget.exerciseId);
     if (result.status == Status.success) {
       resultData = ResultResponse.fromJson(result.data!);
       setState(() {});

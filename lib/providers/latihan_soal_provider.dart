@@ -1,11 +1,15 @@
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:latihan_soal_flutter/constants/api_url.dart';
 import 'package:latihan_soal_flutter/helpers/user_email.dart';
 import 'package:latihan_soal_flutter/models/network_response.dart';
 
-class AuthApi {
+class LatihanSoalProvider extends ChangeNotifier {
+  // NetworkResponse? getMapelResponse;
+  // NetworkResponse? getPaketSoalResponse;
+  // NetworkResponse? getBannerResponse;
 
   Dio dioApi() {
     BaseOptions options = BaseOptions(
@@ -56,30 +60,66 @@ class AuthApi {
     }
   }
 
-  Future<NetworkResponse> getUserByEmail() async {
+  Future<NetworkResponse> getMapel() async {
     final result = await _getRequest(
-      endpoint: ApiUrl.users,
+        endpoint: ApiUrl.latihanMapel,
+        param: {
+          "major_name" : "IPA",
+          "user_email" : UserEmail.getUserEmail(),
+        }
+    );
+
+    return result;
+  }
+
+  Future<NetworkResponse> getPaketSoal(id) async {
+    final result = await _getRequest(
+        endpoint: ApiUrl.latihanPaketSoal,
+        param: {
+          "course_id" : id,
+          "user_email" : UserEmail.getUserEmail(),
+        }
+    );
+
+    return result;
+  }
+
+  Future<NetworkResponse> getBanner() async {
+    final result = await _getRequest(
+      endpoint: ApiUrl.banner,
+    );
+
+    return result;
+  }
+
+  Future<NetworkResponse> getResult(id) async {
+    final result = await _getRequest(
+      endpoint: ApiUrl.latihanSkor,
       param: {
-        "email" : UserEmail.getUserEmail(),
+        "exercise_id" : id,
+        "user_email" : UserEmail.getUserEmail(),
       }
     );
 
     return result;
   }
 
-  Future<NetworkResponse> postRegister(body) async {
+  Future<NetworkResponse> postQuestionList(id) async {
     final result = await _postRequest(
-        endpoint: ApiUrl.usersRegistrasi,
-        body: body,
+      endpoint: ApiUrl.latihanKerjakanSoal,
+      body: {
+        "exercise_id" : id,
+        "user_email" : UserEmail.getUserEmail(),
+      }
     );
 
     return result;
   }
 
-  Future<NetworkResponse> postUpdateUser(body) async {
+  Future<NetworkResponse> postStudentAnswer(payload) async {
     final result = await _postRequest(
-      endpoint: ApiUrl.usersUpdateProfile,
-      body: body,
+      endpoint: ApiUrl.latihanSubmitJawaban,
+      body: payload,
     );
 
     return result;

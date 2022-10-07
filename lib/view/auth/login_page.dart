@@ -9,9 +9,10 @@ import 'package:latihan_soal_flutter/helpers/preference_helper.dart';
 import 'package:latihan_soal_flutter/helpers/user_email.dart';
 import 'package:latihan_soal_flutter/models/network_response.dart';
 import 'package:latihan_soal_flutter/models/user_by_email.dart';
-import 'package:latihan_soal_flutter/repository/auth_api.dart';
-import 'package:latihan_soal_flutter/view/main_page.dart';
-import 'package:latihan_soal_flutter/view/register_page.dart';
+import 'package:latihan_soal_flutter/providers/auth_provider.dart';
+import 'package:latihan_soal_flutter/view/main/main_page.dart';
+import 'package:latihan_soal_flutter/view/auth/register_page.dart';
+import 'package:provider/provider.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -85,7 +86,9 @@ class _LoginPageState extends State<LoginPage> {
 
                 final user = UserEmail.getUserEmail();
                 if (user != null) {
-                  final dataUser = await AuthApi().getUserByEmail();
+                  final provider =
+                  Provider.of<AuthProvider>(context, listen: false);
+                  final dataUser = await provider.getUserByEmail();
                   if (dataUser.status == Status.success) {
                     final data = UserByEmail.fromJson(dataUser.data!);
                     if (data.status == 1) {

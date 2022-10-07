@@ -7,9 +7,10 @@ import 'package:latihan_soal_flutter/models/banner_list.dart';
 import 'package:latihan_soal_flutter/models/mapel_list.dart';
 import 'package:latihan_soal_flutter/models/network_response.dart';
 import 'package:latihan_soal_flutter/models/user_by_email.dart';
-import 'package:latihan_soal_flutter/repository/latihan_soal_api.dart';
+import 'package:latihan_soal_flutter/providers/latihan_soal_provider.dart';
 import 'package:latihan_soal_flutter/view/main/latihan_soal/mapel_page.dart';
 import 'package:latihan_soal_flutter/view/main/latihan_soal/paket_soal_page.dart';
+import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -22,9 +23,11 @@ class _HomePageState extends State<HomePage> {
   MapelList? mapelList;
   BannerList? bannerList;
   UserData? dataUser;
+  LatihanSoalProvider? latihanSoalProvider;
 
   getMapel() async {
-    final mapelResult = await LatihanSoalApi().getMapel();
+    latihanSoalProvider = Provider.of<LatihanSoalProvider>(context, listen: false);
+    final mapelResult = await latihanSoalProvider!.getMapel();
     if (mapelResult.status == Status.success) {
       mapelList = MapelList.fromJson(mapelResult.data!);
       setState(() {});
@@ -32,7 +35,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   getBanner() async {
-    final bannerResult = await LatihanSoalApi().getBanner();
+    final bannerResult = await latihanSoalProvider!.getBanner();
     if (bannerResult.status == Status.success) {
       bannerList = BannerList.fromJson(bannerResult.data!);
       setState(() {});
@@ -44,7 +47,7 @@ class _HomePageState extends State<HomePage> {
     print('tokenfcm: $tokenFcm');
 
     RemoteMessage? initialMessage =
-        await FirebaseMessaging.instance.getInitialMessage();
+    await FirebaseMessaging.instance.getInitialMessage();
 
     // If the message also contains a data property with a "type" of "chat",
     // navigate to a chat screen
@@ -103,28 +106,28 @@ class _HomePageState extends State<HomePage> {
                   SizedBox(height: 10),
                   bannerList == null
                       ? Container(
-                          height: 70,
-                          width: double.infinity,
-                          child: Center(child: CircularProgressIndicator()),
-                        )
+                    height: 70,
+                    width: double.infinity,
+                    child: Center(child: CircularProgressIndicator()),
+                  )
                       : Container(
-                          height: 150,
-                          child: ListView.builder(
-                            itemCount: bannerList!.data!.length,
-                            scrollDirection: Axis.horizontal,
-                            itemBuilder: ((context, index) {
-                              final currentBanner = bannerList!.data![index];
-                              return Padding(
-                                padding: const EdgeInsets.only(left: 20.0),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(10),
-                                  child:
-                                      Image.network(currentBanner.eventImage!),
-                                ),
-                              );
-                            }),
+                    height: 150,
+                    child: ListView.builder(
+                      itemCount: bannerList!.data!.length,
+                      scrollDirection: Axis.horizontal,
+                      itemBuilder: ((context, index) {
+                        final currentBanner = bannerList!.data![index];
+                        return Padding(
+                          padding: const EdgeInsets.only(left: 20.0),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(10),
+                            child:
+                            Image.network(currentBanner.eventImage!),
                           ),
-                        ),
+                        );
+                      }),
+                    ),
+                  ),
                   SizedBox(height: 35),
                 ],
               ),
@@ -170,30 +173,30 @@ class _HomePageState extends State<HomePage> {
           ),
           list == null
               ? Container(
-                  height: 70,
-                  width: double.infinity,
-                  child: Center(child: CircularProgressIndicator()),
-                )
+            height: 70,
+            width: double.infinity,
+            child: Center(child: CircularProgressIndicator()),
+          )
               : ListView.builder(
-                  shrinkWrap: true,
-                  physics: NeverScrollableScrollPhysics(),
-                  itemCount: list.data!.length > 3 ? 3 : list.data!.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    final currentMapel = list.data![index];
-                    return GestureDetector(
-                      onTap: () {
-                        Navigator.of(context)
-                            .push(MaterialPageRoute(builder: (BuildContext context) {
-                          return PaketSoalPage(id: currentMapel.courseId!);
-                        }));
-                      },
-                      child: MapelWidget(
-                        title: currentMapel.courseName!,
-                        totalPacket: currentMapel.jumlahMateri!,
-                        totalDone: currentMapel.jumlahDone!,
-                      ),
-                    );
-                  }),
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
+              itemCount: list.data!.length > 3 ? 3 : list.data!.length,
+              itemBuilder: (BuildContext context, int index) {
+                final currentMapel = list.data![index];
+                return GestureDetector(
+                  onTap: () {
+                    Navigator.of(context)
+                        .push(MaterialPageRoute(builder: (BuildContext context) {
+                      return PaketSoalPage(id: currentMapel.courseId!);
+                    }));
+                  },
+                  child: MapelWidget(
+                    title: currentMapel.courseName!,
+                    totalPacket: currentMapel.jumlahMateri!,
+                    totalDone: currentMapel.jumlahDone!,
+                  ),
+                );
+              }),
         ],
       ),
     );

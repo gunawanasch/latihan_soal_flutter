@@ -4,7 +4,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:latihan_soal_flutter/constants/r.dart';
 import 'package:latihan_soal_flutter/helpers/preference_helper.dart';
 import 'package:latihan_soal_flutter/models/user_by_email.dart';
-import 'package:latihan_soal_flutter/view/login_page.dart';
+import 'package:latihan_soal_flutter/view/auth/login_page.dart';
 import 'package:latihan_soal_flutter/view/main/profile/edit_profile_page.dart';
 
 class ProfilePage extends StatefulWidget {

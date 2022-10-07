@@ -3,10 +3,13 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:latihan_soal_flutter/constants/r.dart';
-import 'package:latihan_soal_flutter/view/login_page.dart';
-import 'package:latihan_soal_flutter/view/main_page.dart';
-import 'package:latihan_soal_flutter/view/register_page.dart';
+import 'package:latihan_soal_flutter/providers/auth_provider.dart';
+import 'package:latihan_soal_flutter/providers/latihan_soal_provider.dart';
+import 'package:latihan_soal_flutter/view/auth/login_page.dart';
+import 'package:latihan_soal_flutter/view/main/main_page.dart';
+import 'package:latihan_soal_flutter/view/auth/register_page.dart';
 import 'package:latihan_soal_flutter/view/splash_screen.dart';
+import 'package:provider/provider.dart';
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   // If you're going to use other Firebase services in the background, such as Firestore,
@@ -32,22 +35,28 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Latihan Soal',
-      theme: ThemeData(
-        textTheme: GoogleFonts.poppinsTextTheme(),
-        appBarTheme: AppBarTheme(
-          backgroundColor: R.colors.primary,
-        )
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider<AuthProvider>( create: (context) => AuthProvider()),
+        ChangeNotifierProvider<LatihanSoalProvider>( create: (context) => LatihanSoalProvider()),
+      ],
+      child: MaterialApp(
+        title: 'Latihan Soal',
+        theme: ThemeData(
+          textTheme: GoogleFonts.poppinsTextTheme(),
+          appBarTheme: AppBarTheme(
+            backgroundColor: R.colors.primary,
+          )
+        ),
+        // home: const SplashScreen(),
+        initialRoute: '/',
+        routes: {
+          '/': (context) => const SplashScreen(),
+          LoginPage.route: (context) => const LoginPage(),
+          RegisterPage.route: (context) => const RegisterPage(),
+          MainPage.route: (context) => const MainPage(),
+        },
       ),
-      // home: const SplashScreen(),
-      initialRoute: '/',
-      routes: {
-        '/': (context) => const SplashScreen(),
-        LoginPage.route: (context) => const LoginPage(),
-        RegisterPage.route: (context) => const RegisterPage(),
-        MainPage.route: (context) => const MainPage(),
-      },
     );
   }
 }

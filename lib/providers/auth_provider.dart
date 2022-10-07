@@ -1,11 +1,12 @@
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:latihan_soal_flutter/constants/api_url.dart';
 import 'package:latihan_soal_flutter/helpers/user_email.dart';
 import 'package:latihan_soal_flutter/models/network_response.dart';
 
-class LatihanSoalApi {
+class AuthProvider extends ChangeNotifier {
 
   Dio dioApi() {
     BaseOptions options = BaseOptions(
@@ -56,66 +57,30 @@ class LatihanSoalApi {
     }
   }
 
-  Future<NetworkResponse> getMapel() async {
+  Future<NetworkResponse> getUserByEmail() async {
     final result = await _getRequest(
-      endpoint: ApiUrl.latihanMapel,
+      endpoint: ApiUrl.users,
       param: {
-        "major_name" : "IPA",
-        "user_email" : UserEmail.getUserEmail(),
+        "email" : UserEmail.getUserEmail(),
       }
     );
 
     return result;
   }
 
-  Future<NetworkResponse> getPaketSoal(id) async {
-    final result = await _getRequest(
-        endpoint: ApiUrl.latihanPaketSoal,
-        param: {
-          "course_id" : id,
-          "user_email" : UserEmail.getUserEmail(),
-        }
-    );
-
-    return result;
-  }
-
-  Future<NetworkResponse> getBanner() async {
-    final result = await _getRequest(
-        endpoint: ApiUrl.banner,
-    );
-
-    return result;
-  }
-
-  Future<NetworkResponse> getResult(id) async {
-    final result = await _getRequest(
-      endpoint: ApiUrl.latihanSkor,
-      param: {
-        "exercise_id" : id,
-        "user_email" : UserEmail.getUserEmail(),
-      }
-    );
-
-    return result;
-  }
-
-  Future<NetworkResponse> postQuestionList(id) async {
+  Future<NetworkResponse> postRegister(body) async {
     final result = await _postRequest(
-      endpoint: ApiUrl.latihanKerjakanSoal,
-      body: {
-        "exercise_id" : id,
-        "user_email" : UserEmail.getUserEmail(),
-      }
+      endpoint: ApiUrl.usersRegistrasi,
+      body: body,
     );
 
     return result;
   }
 
-  Future<NetworkResponse> postStudentAnswer(payload) async {
+  Future<NetworkResponse> postUpdateUser(body) async {
     final result = await _postRequest(
-        endpoint: ApiUrl.latihanSubmitJawaban,
-        body: payload,
+      endpoint: ApiUrl.usersUpdateProfile,
+      body: body,
     );
 
     return result;

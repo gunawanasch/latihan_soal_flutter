@@ -4,9 +4,9 @@ import 'package:latihan_soal_flutter/helpers/preference_helper.dart';
 import 'package:latihan_soal_flutter/helpers/user_email.dart';
 import 'package:latihan_soal_flutter/models/network_response.dart';
 import 'package:latihan_soal_flutter/models/user_by_email.dart';
-import 'package:latihan_soal_flutter/repository/auth_api.dart';
-import 'package:latihan_soal_flutter/view/login_page.dart';
-import 'package:latihan_soal_flutter/view/main_page.dart';
+import 'package:latihan_soal_flutter/providers/auth_provider.dart';
+import 'package:latihan_soal_flutter/view/auth/login_page.dart';
+import 'package:provider/provider.dart';
 
 class EditProfilePage extends StatefulWidget {
   const EditProfilePage({Key? key}) : super(key: key);
@@ -90,7 +90,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 "foto": UserEmail.getUserPhotoUrl(),
               };
 
-              final result = await AuthApi().postUpdateUser(json);
+              final provider = Provider.of<AuthProvider>(context, listen: false);
+              final result = await provider.postUpdateUser(json);
               if (result.status == Status.success) {
                 final registerResult = UserByEmail.fromJson(result.data!);
                 if (registerResult.status == 1) {
