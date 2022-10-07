@@ -1,6 +1,8 @@
-# latihan_soal_flutter
-
 Flutter project about education app.
+
+Notes about branch:
+master - provider
+original - without package of state management
 
 ## Getting Started
 
