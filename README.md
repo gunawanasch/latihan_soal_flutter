@@ -1,5 +1,4 @@
-Flutter project about education app.
-
+Flutter project about education app. 
 
 Notes about branches:
 - master : using provider
