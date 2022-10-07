@@ -1,8 +1,9 @@
 Flutter project about education app.
 
-Notes about branch:
-- master : provider
-- original : without package of state management
+
+Notes about branches:
+- master : using provider
+- original : without state management package
 
 ## Getting Started
 
